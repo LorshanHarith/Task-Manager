@@ -4,7 +4,6 @@ from tkinter import ttk
 from datetime import datetime
 
 
-# Task class to represent individual tasks
 class Task:
     def __init__(self, name, description, priority, due_date):
         self.name = name
@@ -21,7 +20,6 @@ class Task:
         }
 
 
-# TaskManager class to manage tasks and JSON handling
 class TaskManager:
     def __init__(self, json_file='tasks.json'):
         self.json_file = json_file
@@ -39,13 +37,17 @@ class TaskManager:
             print("Error decoding JSON.")
             self.tasks = []
 
+    # noinspection PyMethodMayBeStatic
+    def _name_contains(self, task, search_term):
+        return search_term.lower() in task.name.lower()
+
     def get_filtered_tasks(self, name_filter=None, priority_filter=None, due_date_filter=None):
         filtered = self.tasks
-        if name_filter:
-            filtered = [t for t in filtered if name_filter.lower() in t.name.lower()]
+        if name_filter and name_filter.strip():
+            filtered = [t for t in filtered if self._name_contains(t, name_filter)]
         if priority_filter:
             filtered = [t for t in filtered if t.priority == priority_filter]
-        if due_date_filter:
+        if due_date_filter and due_date_filter.strip():
             filtered = [t for t in filtered if t.due_date == due_date_filter]
         return filtered
 
@@ -59,12 +61,18 @@ class TaskManager:
             self.tasks.sort(key=lambda t: datetime.strptime(t.due_date, "%Y-%m-%d"))
 
 
-# GUI class using Tkinter
 class TaskManagerGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("Personal Task Manager")
         self.task_manager = TaskManager()
+
+        # Initialize attributes to suppress warnings
+        self.name_filter = None
+        self.priority_filter = None
+        self.due_date_filter = None
+        self.tree = None
+
         self.setup_gui()
         self.populate_tree()
 
@@ -88,9 +96,8 @@ class TaskManagerGUI:
         tk.Button(frame, text="Filter", command=self.apply_filter).grid(row=0, column=6, padx=5)
 
         # Treeview for displaying tasks
-        columns = ("name", "description", "priority", "due_date")
-        self.tree = ttk.Treeview(self.root, columns=columns, show='headings')
-        for col in columns:
+        self.tree = ttk.Treeview(self.root, columns=("name", "description", "priority", "due_date"), show='headings')
+        for col in ("name", "description", "priority", "due_date"):
             self.tree.heading(col, text=col.title(), command=lambda c=col: self.sort_tasks(c))
             self.tree.column(col, width=150)
         self.tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
@@ -104,9 +111,9 @@ class TaskManagerGUI:
             self.tree.insert('', 'end', values=(task.name, task.description, task.priority, task.due_date))
 
     def apply_filter(self):
-        name = self.name_filter.get().strip()
-        priority = self.priority_filter.get()
-        due_date = self.due_date_filter.get().strip()
+        name = self.name_filter.get().strip() or None
+        priority = self.priority_filter.get() or None
+        due_date = self.due_date_filter.get().strip() or None
         filtered = self.task_manager.get_filtered_tasks(name, priority, due_date)
         self.populate_tree(filtered)
 
@@ -115,7 +122,7 @@ class TaskManagerGUI:
         self.populate_tree()
 
 
-# Start the GUI
+# noinspection PyShadowingNames
 if __name__ == "__main__":
     root = tk.Tk()
     app = TaskManagerGUI(root)
