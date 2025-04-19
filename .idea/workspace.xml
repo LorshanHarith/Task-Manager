@@ -4,20 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="04251867-f88c-4c10-98dc-f7e8a1c4b279" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/Stages-Task-Manager.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Fault Test.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Stage 1.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Stage 2.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Stage 3.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Stage 4.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tasks.txt" afterDir="false" />
+    <list default="true" id="04251867-f88c-4c10-98dc-f7e8a1c4b279" name="Changes" comment="Task Manager[work-in-progress]">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,6 +54,55 @@
       <option name="presentableId" value="Default" />
       <updated>1744826399631</updated>
     </task>
+    <task id="LOCAL-00001" summary="Task Manager[work-in-progress]">
+      <option name="closed" value="true" />
+      <created>1745075219108</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1745075219108</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="OPEN_GENERIC_TABS">
+      <map>
+        <entry key="8d3f8010-58c2-4c72-8895-eee00e971f8d" value="TOOL_WINDOW" />
+      </map>
+    </option>
+    <option name="TAB_STATES">
+      <map>
+        <entry key="8d3f8010-58c2-4c72-8895-eee00e971f8d">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="roots">
+                    <value>
+                      <list>
+                        <option value="$PROJECT_DIR$" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Task Manager[work-in-progress]" />
+    <option name="LAST_COMMIT_MESSAGE" value="Task Manager[work-in-progress]" />
   </component>
 </project>
