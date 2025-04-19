@@ -3,8 +3,6 @@ import tkinter as tk
 from tkinter import ttk
 from datetime import datetime
 
-
-# Task class to represent individual tasks
 class Task:
     def __init__(self, name, description, priority, due_date):
         self.name = name
@@ -20,8 +18,6 @@ class Task:
             "due_date": self.due_date
         }
 
-
-# TaskManager class to manage tasks and JSON handling
 class TaskManager:
     def __init__(self, json_file='tasks.json'):
         self.json_file = json_file
@@ -32,34 +28,44 @@ class TaskManager:
         try:
             with open(self.json_file, 'r') as file:
                 data = json.load(file)
-                self.tasks = [Task(**task) for task in data]
+                for task_data in data:
+                    self.tasks.append(Task(**task_data))
         except FileNotFoundError:
             self.tasks = []
         except json.JSONDecodeError:
-            print("Error decoding JSON.")
-            self.tasks = []
+            print("Error: Invalid JSON file.")
 
     def get_filtered_tasks(self, name_filter=None, priority_filter=None, due_date_filter=None):
-        filtered = self.tasks
-        if name_filter:
-            filtered = [t for t in filtered if name_filter.lower() in t.name.lower()]
-        if priority_filter:
-            filtered = [t for t in filtered if t.priority == priority_filter]
-        if due_date_filter:
-            filtered = [t for t in filtered if t.due_date == due_date_filter]
+        filtered = []
+        for task in self.tasks:
+            if name_filter and name_filter.lower() not in task.name.lower():
+                continue
+            if priority_filter and task.priority != priority_filter:
+                continue
+            if due_date_filter and task.due_date != due_date_filter:
+                continue
+            filtered.append(task)
         return filtered
 
     def sort_tasks(self, sort_key='name'):
         if sort_key == 'name':
-            self.tasks.sort(key=lambda t: t.name.lower())
+            self.tasks.sort(key=self._get_name)
         elif sort_key == 'priority':
-            priority_order = {'High': 1, 'Medium': 2, 'Low': 3}
-            self.tasks.sort(key=lambda t: priority_order.get(t.priority, 4))
+            self.tasks.sort(key=self._get_priority_value)
         elif sort_key == 'due_date':
-            self.tasks.sort(key=lambda t: datetime.strptime(t.due_date, "%Y-%m-%d"))
+            self.tasks.sort(key=self._get_due_date)
 
+    # Helper methods to replace lambda
+    def _get_name(self, task):
+        return task.name.lower()
 
-# GUI class using Tkinter
+    def _get_priority_value(self, task):
+        priority_order = {'High': 1, 'Medium': 2, 'Low': 3}
+        return priority_order.get(task.priority, 4)
+
+    def _get_due_date(self, task):
+        return datetime.strptime(task.due_date, "%Y-%m-%d")
+
 class TaskManagerGUI:
     def __init__(self, root):
         self.root = root
@@ -70,52 +76,59 @@ class TaskManagerGUI:
 
     def setup_gui(self):
         # Filter section
-        frame = tk.Frame(self.root)
-        frame.pack(pady=10)
+        filter_frame = tk.Frame(self.root)
+        filter_frame.pack(pady=10)
 
-        tk.Label(frame, text="Name:").grid(row=0, column=0)
-        self.name_filter = tk.Entry(frame)
+        tk.Label(filter_frame, text="Name:").grid(row=0, column=0)
+        self.name_filter = tk.Entry(filter_frame)
         self.name_filter.grid(row=0, column=1)
 
-        tk.Label(frame, text="Priority:").grid(row=0, column=2)
-        self.priority_filter = ttk.Combobox(frame, values=["", "High", "Medium", "Low"], state="readonly")
+        tk.Label(filter_frame, text="Priority:").grid(row=0, column=2)
+        self.priority_filter = ttk.Combobox(filter_frame, values=["", "High", "Medium", "Low"])
         self.priority_filter.grid(row=0, column=3)
 
-        tk.Label(frame, text="Due Date (YYYY-MM-DD):").grid(row=0, column=4)
-        self.due_date_filter = tk.Entry(frame)
+        tk.Label(filter_frame, text="Due Date:").grid(row=0, column=4)
+        self.due_date_filter = tk.Entry(filter_frame)
         self.due_date_filter.grid(row=0, column=5)
 
-        tk.Button(frame, text="Filter", command=self.apply_filter).grid(row=0, column=6, padx=5)
+        filter_button = tk.Button(filter_frame, text="Filter", command=self.apply_filter)
+        filter_button.grid(row=0, column=6, padx=5)
 
-        # Treeview for displaying tasks
-        columns = ("name", "description", "priority", "due_date")
-        self.tree = ttk.Treeview(self.root, columns=columns, show='headings')
-        for col in columns:
-            self.tree.heading(col, text=col.title(), command=lambda c=col: self.sort_tasks(c))
-            self.tree.column(col, width=150)
+        # Treeview setup
+        self.tree = ttk.Treeview(self.root, columns=("name", "description", "priority", "due_date"), show='headings')
+        self.tree.heading("name", text="Name", command=self.sort_by_name)
+        self.tree.heading("priority", text="Priority", command=self.sort_by_priority)
+        self.tree.heading("due_date", text="Due Date", command=self.sort_by_due_date)
         self.tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
     def populate_tree(self, tasks=None):
         for item in self.tree.get_children():
             self.tree.delete(item)
-        if tasks is None:
-            tasks = self.task_manager.tasks
+        tasks = tasks or self.task_manager.tasks
         for task in tasks:
             self.tree.insert('', 'end', values=(task.name, task.description, task.priority, task.due_date))
 
     def apply_filter(self):
-        name = self.name_filter.get().strip()
-        priority = self.priority_filter.get()
-        due_date = self.due_date_filter.get().strip()
-        filtered = self.task_manager.get_filtered_tasks(name, priority, due_date)
+        filtered = self.task_manager.get_filtered_tasks(
+            name_filter=self.name_filter.get().strip(),
+            priority_filter=self.priority_filter.get(),
+            due_date_filter=self.due_date_filter.get().strip()
+        )
         self.populate_tree(filtered)
 
-    def sort_tasks(self, sort_key):
-        self.task_manager.sort_tasks(sort_key)
+    # Simplified sorting methods
+    def sort_by_name(self):
+        self.task_manager.sort_tasks('name')
         self.populate_tree()
 
+    def sort_by_priority(self):
+        self.task_manager.sort_tasks('priority')
+        self.populate_tree()
 
-# Start the GUI
+    def sort_by_due_date(self):
+        self.task_manager.sort_tasks('due_date')
+        self.populate_tree()
+
 if __name__ == "__main__":
     root = tk.Tk()
     app = TaskManagerGUI(root)
