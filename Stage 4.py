@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 from datetime import datetime
 
+
 class Task:
     def __init__(self, name, description, priority, due_date):
         self.name = name
@@ -17,6 +18,7 @@ class Task:
             "priority": self.priority,
             "due_date": self.due_date
         }
+
 
 class TaskManager:
     def __init__(self, json_file='tasks.json'):
@@ -35,16 +37,19 @@ class TaskManager:
         except json.JSONDecodeError:
             print("Error: Invalid JSON file.")
 
-    def get_filtered_tasks(self, name_filter=None, priority_filter=None, due_date_filter=None):
+    def get_filtered_tasks(self, name_filter="", priority_filter="", due_date_filter=""):
         filtered = []
         for task in self.tasks:
-            if name_filter and name_filter.lower() not in task.name.lower():
-                continue
-            if priority_filter and task.priority != priority_filter:
-                continue
-            if due_date_filter and task.due_date != due_date_filter:
-                continue
-            filtered.append(task)
+            # Check name filter (if provided)
+            name_match = (not name_filter) or (name_filter.lower() in task.name.lower())
+            # Check priority filter (if provided)
+            priority_match = (not priority_filter) or (task.priority == priority_filter)
+            # Check due date filter (if provided)
+            date_match = (not due_date_filter) or (task.due_date == due_date_filter)
+
+            # Only add task if it matches all active filters
+            if name_match and priority_match and date_match:
+                filtered.append(task)
         return filtered
 
     def sort_tasks(self, sort_key='name'):
@@ -65,6 +70,7 @@ class TaskManager:
 
     def _get_due_date(self, task):
         return datetime.strptime(task.due_date, "%Y-%m-%d")
+
 
 class TaskManagerGUI:
     def __init__(self, root):
@@ -102,11 +108,19 @@ class TaskManagerGUI:
         self.tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
     def populate_tree(self, tasks=None):
+        # Clear existing items
         for item in self.tree.get_children():
             self.tree.delete(item)
+
+        # Use provided tasks or all tasks if None
         tasks = tasks or self.task_manager.tasks
-        for task in tasks:
-            self.tree.insert('', 'end', values=(task.name, task.description, task.priority, task.due_date))
+
+        # Show "No tasks found" if empty
+        if not tasks:
+            self.tree.insert('', 'end', values=("No tasks found", "", "", ""))
+        else:
+            for task in tasks:
+                self.tree.insert('', 'end', values=(task.name, task.description, task.priority, task.due_date))
 
     def apply_filter(self):
         filtered = self.task_manager.get_filtered_tasks(
@@ -116,7 +130,7 @@ class TaskManagerGUI:
         )
         self.populate_tree(filtered)
 
-    # Simplified sorting methods
+    # Sorting methods
     def sort_by_name(self):
         self.task_manager.sort_tasks('name')
         self.populate_tree()
@@ -128,6 +142,7 @@ class TaskManagerGUI:
     def sort_by_due_date(self):
         self.task_manager.sort_tasks('due_date')
         self.populate_tree()
+
 
 if __name__ == "__main__":
     root = tk.Tk()
