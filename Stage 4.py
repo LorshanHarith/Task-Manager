@@ -3,7 +3,6 @@ import tkinter as tk
 from tkinter import ttk
 from datetime import datetime
 
-
 class Task:
     def __init__(self, name, description, priority, due_date):
         self.name = name
@@ -18,7 +17,6 @@ class Task:
             "priority": self.priority,
             "due_date": self.due_date
         }
-
 
 class TaskManager:
     def __init__(self, json_file='tasks.json'):
@@ -40,22 +38,33 @@ class TaskManager:
     def get_filtered_tasks(self, name_filter=None, priority_filter=None, due_date_filter=None):
         filtered = self.tasks
         if name_filter and name_filter.strip():
-            filtered = [t for t in filtered if name_filter.lower() in t.name.lower()]
+            filtered = [t for t in filtered if self._name_contains(t, name_filter)]
         if priority_filter:
             filtered = [t for t in filtered if t.priority == priority_filter]
         if due_date_filter and due_date_filter.strip():
             filtered = [t for t in filtered if t.due_date == due_date_filter]
         return filtered
 
+    def _name_contains(self, task, search_term):
+        return search_term.lower() in task.name.lower()
+
     def sort_tasks(self, sort_key='name'):
         if sort_key == 'name':
-            self.tasks.sort(key=lambda t: t.name.lower())
+            self.tasks.sort(key=self._get_name_key)
         elif sort_key == 'priority':
-            priority_order = {'High': 1, 'Medium': 2, 'Low': 3}
-            self.tasks.sort(key=lambda t: priority_order.get(t.priority, 4))
+            self.tasks.sort(key=self._get_priority_key)
         elif sort_key == 'due_date':
-            self.tasks.sort(key=lambda t: datetime.strptime(t.due_date, "%Y-%m-%d"))
+            self.tasks.sort(key=self._get_date_key)
 
+    def _get_name_key(self, task):
+        return task.name.lower()
+
+    def _get_priority_key(self, task):
+        priority_order = {'High': 1, 'Medium': 2, 'Low': 3}
+        return priority_order.get(task.priority, 4)
+
+    def _get_date_key(self, task):
+        return datetime.strptime(task.due_date, "%Y-%m-%d")
 
 class TaskManagerGUI:
     def __init__(self, root):
@@ -64,6 +73,12 @@ class TaskManagerGUI:
         self.task_manager = TaskManager()
         self.setup_gui()
         self.populate_tree()
+        self._setup_sort_bindings()
+
+    def _setup_sort_bindings(self):
+        self.tree.heading("name", text="Name", command=self._sort_by_name)
+        self.tree.heading("priority", text="Priority", command=self._sort_by_priority)
+        self.tree.heading("due_date", text="Due Date", command=self._sort_by_date)
 
     def setup_gui(self):
         # Filter section
@@ -85,10 +100,8 @@ class TaskManagerGUI:
         tk.Button(frame, text="Filter", command=self.apply_filter).grid(row=0, column=6, padx=5)
 
         # Treeview for displaying tasks
-        columns = ("name", "description", "priority", "due_date")
-        self.tree = ttk.Treeview(self.root, columns=columns, show='headings')
-        for col in columns:
-            self.tree.heading(col, text=col.title(), command=lambda c=col: self.sort_tasks(c))
+        self.tree = ttk.Treeview(self.root, columns=("name", "description", "priority", "due_date"), show='headings')
+        for col in ("name", "description", "priority", "due_date"):
             self.tree.column(col, width=150)
         self.tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
@@ -107,10 +120,17 @@ class TaskManagerGUI:
         filtered = self.task_manager.get_filtered_tasks(name, priority, due_date)
         self.populate_tree(filtered)
 
-    def sort_tasks(self, sort_key):
-        self.task_manager.sort_tasks(sort_key)
+    def _sort_by_name(self):
+        self.task_manager.sort_tasks('name')
         self.populate_tree()
 
+    def _sort_by_priority(self):
+        self.task_manager.sort_tasks('priority')
+        self.populate_tree()
+
+    def _sort_by_date(self):
+        self.task_manager.sort_tasks('due_date')
+        self.populate_tree()
 
 if __name__ == "__main__":
     root = tk.Tk()
