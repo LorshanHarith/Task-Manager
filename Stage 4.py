@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 from datetime import datetime
 
+
 class Task:
     def __init__(self, name, description, priority, due_date):
         self.name = name
@@ -17,6 +18,7 @@ class Task:
             "priority": self.priority,
             "due_date": self.due_date
         }
+
 
 class TaskManager:
     def __init__(self, json_file='tasks.json'):
@@ -65,6 +67,7 @@ class TaskManager:
 
     def _get_due_date(self, task):
         return datetime.strptime(task.due_date, "%Y-%m-%d")
+
 
 class TaskManagerGUI:
     def __init__(self, root):
@@ -128,6 +131,7 @@ class TaskManagerGUI:
     def sort_by_due_date(self):
         self.task_manager.sort_tasks('due_date')
         self.populate_tree()
+
 
 if __name__ == "__main__":
     root = tk.Tk()
