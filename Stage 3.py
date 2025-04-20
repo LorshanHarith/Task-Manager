@@ -47,6 +47,7 @@ def add_task():
     tasks.append(new_task)
     print(f"Task '{name}' added successfully!")
 
+
 # Display tasks in readable format
 def view_tasks():
     if not tasks:
@@ -56,6 +57,7 @@ def view_tasks():
     print("\nCurrent Tasks:")
     for i, task in enumerate(tasks, start=1):
         print(f"{i}. {task['name']} | {task['description']} (Priority: {task['priority']}, Due: {task['due_date']})")
+
 
 # Update an existing task's fields
 def update_task():
@@ -98,6 +100,7 @@ def update_task():
 
     print("Task not found.")
 
+
 # Delete a task by its name
 def delete_task():
     name = input("\nEnter the name of the task to delete: ").strip()
@@ -133,6 +136,7 @@ def load_tasks_from_json():
     except Exception as e:
         print(f"Oops, something went wrong while loading tasks: {e}")
 
+
 # Save tasks to a JSON file before program exits
 def save_tasks_to_json():
     try:
@@ -141,6 +145,7 @@ def save_tasks_to_json():
         print("All tasks have been saved successfully!")
     except Exception as e:
         print(f"An error occurred while saving tasks: {e}")
+
 
 # Main Menu Loop
 
