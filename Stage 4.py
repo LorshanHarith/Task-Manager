@@ -80,6 +80,7 @@ class TaskManagerGUI:
 
     def setup_sort_buttons(self):
         self.tree.heading("name", text="Name", command=self.sort_by_name)
+        self.tree.heading("description", text="Description")
         self.tree.heading("priority", text="Priority", command=self.sort_by_priority)
         self.tree.heading("due_date", text="Due Date", command=self.sort_by_date)
 
