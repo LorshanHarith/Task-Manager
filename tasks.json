@@ -10,5 +10,11 @@
         "description": "nootropics",
         "priority": "Low",
         "due_date": "2024-01-01"
+    },
+    {
+        "name": "water plant",
+        "description": "water my plants",
+        "priority": "High",
+        "due_date": "2024-01-01"
     }
 ]
