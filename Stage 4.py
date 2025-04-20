@@ -158,6 +158,7 @@ class TaskManagerGUI:
         self.task_manager.sort_tasks('due_date')
         self.populate_tree()
 
+
 # Main program entry point
 if __name__ == "__main__":
     root = tk.Tk()  # Create main window
