@@ -20,6 +20,7 @@ def add_task():
 
     description = input("Enter task description: ").strip()
 
+    # Ensure priority is valid
     valid_priorities = {"High", "Medium", "Low"}
     while True:
         priority = input("Enter priority (High, Medium, Low): ").strip().capitalize()
@@ -27,6 +28,7 @@ def add_task():
             break
         print("Invalid priority! Please enter 'High', 'Medium', or 'Low'.")
 
+    # Valid date format
     while True:
         due_date = input("Enter due date (YYYY-MM-DD): ").strip()
         try:
@@ -35,6 +37,7 @@ def add_task():
         except ValueError:
             print("Invalid date format! Please enter the due date in YYYY-MM-DD format.")
 
+    # Create and add the new task
     new_task = {
         "name": name,
         "description": description,
@@ -44,7 +47,7 @@ def add_task():
     tasks.append(new_task)
     print(f"Task '{name}' added successfully!")
 
-
+# Display tasks in readable format
 def view_tasks():
     if not tasks:
         print("\nNo tasks available.")
@@ -54,7 +57,7 @@ def view_tasks():
     for i, task in enumerate(tasks, start=1):
         print(f"{i}. {task['name']} | {task['description']} (Priority: {task['priority']}, Due: {task['due_date']})")
 
-
+# Update an existing task's fields
 def update_task():
     name = input("\nEnter the name of the task to update: ").strip()
 
@@ -62,10 +65,12 @@ def update_task():
         if task["name"] == name:
             print("Leave blank to keep the existing value.")
 
+            # Update an existing task's fields
             new_description = input("Enter new description: ").strip()
             if new_description:
                 task["description"] = new_description
 
+            # Update priority with validation
             valid_priorities = {"High", "Medium", "Low"}
             while True:
                 new_priority = input("Enter new priority (High, Medium, Low): ").strip().capitalize()
@@ -76,6 +81,7 @@ def update_task():
                     break
                 print("Invalid priority! Please enter 'High', 'Medium', or 'Low'.")
 
+            # Update due date with validation
             while True:
                 new_due_date = input("Enter new due date (YYYY-MM-DD): ").strip()
                 if not new_due_date:
@@ -92,7 +98,7 @@ def update_task():
 
     print("Task not found.")
 
-
+# Delete a task by its name
 def delete_task():
     name = input("\nEnter the name of the task to delete: ").strip()
 
@@ -106,12 +112,15 @@ def delete_task():
 
 
 # JSON file handling functions
+
+# Load tasks from JSON file
 def load_tasks_from_json():
     try:
         with open("tasks.json", "r") as file:
             data = json.load(file)
             if isinstance(data, list):
                 for item in data:
+                    # Ensure each loaded item has all necessary keys
                     if all(k in item for k in ("name", "description", "priority", "due_date")):
                         tasks.append(item)
                     else:
@@ -124,7 +133,7 @@ def load_tasks_from_json():
     except Exception as e:
         print(f"Oops, something went wrong while loading tasks: {e}")
 
-
+# Save tasks to a JSON file before program exits
 def save_tasks_to_json():
     try:
         with open("tasks.json", "w") as file:
@@ -133,9 +142,11 @@ def save_tasks_to_json():
     except Exception as e:
         print(f"An error occurred while saving tasks: {e}")
 
+# Main Menu Loop
 
+# Only runs when the script is executed directly
 if __name__ == "__main__":
-    load_tasks_from_json()
+    load_tasks_from_json()  # Load saved tasks when program starts
     while True:
         print("\nTask Manager")
         print("==============")
