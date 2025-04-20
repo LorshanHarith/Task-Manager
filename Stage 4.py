@@ -40,32 +40,32 @@ class TaskManager:
     def get_filtered_tasks(self, name_filter=None, priority_filter=None, due_date_filter=None):
         filtered = self.tasks
         if name_filter and name_filter.strip():
-            filtered = [t for t in filtered if self._name_contains(t, name_filter)]
+            filtered = [t for t in filtered if self.does_task_contain_name(t, name_filter)]
         if priority_filter:
             filtered = [t for t in filtered if t.priority == priority_filter]
         if due_date_filter and due_date_filter.strip():
             filtered = [t for t in filtered if t.due_date == due_date_filter]
         return filtered
 
-    def _name_contains(self, task, search_term):
+    def does_task_contain_name(self, task, search_term):
         return search_term.lower() in task.name.lower()
 
     def sort_tasks(self, sort_key='name'):
         if sort_key == 'name':
-            self.tasks.sort(key=self._get_name_key)
+            self.tasks.sort(key=self.get_name_for_sorting)
         elif sort_key == 'priority':
-            self.tasks.sort(key=self._get_priority_key)
+            self.tasks.sort(key=self.get_priority_for_sorting)
         elif sort_key == 'due_date':
-            self.tasks.sort(key=self._get_date_key)
+            self.tasks.sort(key=self.get_date_for_sorting)
 
-    def _get_name_key(self, task):
+    def get_name_for_sorting(self, task):
         return task.name.lower()
 
-    def _get_priority_key(self, task):
-        priority_order = {'High': 1, 'Medium': 2, 'Low': 3}
-        return priority_order.get(task.priority, 4)
+    def get_priority_for_sorting(self, task):
+        priority_values = {'High': 1, 'Medium': 2, 'Low': 3}
+        return priority_values.get(task.priority, 4)
 
-    def _get_date_key(self, task):
+    def get_date_for_sorting(self, task):
         return datetime.strptime(task.due_date, "%Y-%m-%d")
 
 
@@ -76,12 +76,12 @@ class TaskManagerGUI:
         self.task_manager = TaskManager()
         self.setup_gui()
         self.populate_tree()
-        self._setup_sort_bindings()
+        self.setup_sort_buttons()
 
-    def _setup_sort_bindings(self):
-        self.tree.heading("name", text="Name", command=self._sort_by_name)
-        self.tree.heading("priority", text="Priority", command=self._sort_by_priority)
-        self.tree.heading("due_date", text="Due Date", command=self._sort_by_date)
+    def setup_sort_buttons(self):
+        self.tree.heading("name", text="Name", command=self.sort_by_name)
+        self.tree.heading("priority", text="Priority", command=self.sort_by_priority)
+        self.tree.heading("due_date", text="Due Date", command=self.sort_by_date)
 
     def setup_gui(self):
         # Filter section
@@ -123,15 +123,15 @@ class TaskManagerGUI:
         filtered = self.task_manager.get_filtered_tasks(name, priority, due_date)
         self.populate_tree(filtered)
 
-    def _sort_by_name(self):
+    def sort_by_name(self):
         self.task_manager.sort_tasks('name')
         self.populate_tree()
 
-    def _sort_by_priority(self):
+    def sort_by_priority(self):
         self.task_manager.sort_tasks('priority')
         self.populate_tree()
 
-    def _sort_by_date(self):
+    def sort_by_date(self):
         self.task_manager.sort_tasks('due_date')
         self.populate_tree()
 
